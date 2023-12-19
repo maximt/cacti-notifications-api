@@ -1,0 +1,15 @@
+- name: Run database migrations
+  block:
+    - name: Check migrations
+      ansible.builtin.shell:
+        cmd: ./../vendor/bin/doctrine-migrations up-to-date -n -q
+        chdir: /var/www/cacti_api/app/
+      register: migrations_status
+      no_log: true
+      ignore_errors: yes
+
+    - name: Run migrations
+      ansible.builtin.shell:
+        cmd: ./../vendor/bin/doctrine-migrations migrate -n -q
+        chdir: /var/www/cacti_api/app/
+      when: migrations_status.rc != 0

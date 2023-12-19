@@ -1,0 +1,33 @@
+- name: Create install directory
+  file:
+    state: directory
+    path: /var/www/cacti_api/app/
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: 0755
+
+- name: Sync sources with remote host
+  ansible.posix.synchronize:
+    src: ../app/
+    dest: /var/www/cacti_api/app/
+    delete: yes
+    recursive: yes
+    rsync_opts:
+      - "--chmod=F0644,D755"
+      - "--chown={{ app_user }}:{{ app_group }}"
+      - "--exclude-from='.deploy_ignore'"
+      - "--log-file='logs/sync.cacti.log'"
+      - "--no-motd"
+
+- name: Copy app configuration and entrypoint
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/cacti_api/
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "0644"
+  with_items:
+    - ./.env
+    - ../.htaccess
+    - ../index.php
+  
