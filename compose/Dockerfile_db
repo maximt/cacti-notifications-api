@@ -1,0 +1,4 @@
+FROM docker.io/library/mariadb:latest
+ENV TZ 'Asia/Novosibirsk'
+
+COPY compose/confs_db/cacti_db_test.gz compose/confs_db/create_db.sh /docker-entrypoint-initdb.d/

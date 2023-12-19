@@ -1,0 +1,25 @@
+FROM docker.io/library/php:apache
+ENV TZ 'Asia/Novosibirsk'
+
+COPY compose/confs_web/php_custom.ini $PHP_INI_DIR/conf.d/
+
+RUN apt-get update \
+    && apt-get install -y libzip-dev \
+    && docker-php-ext-install pdo_mysql zip \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \ 
+    && a2enmod rewrite && a2enmod ssl && a2enmod socache_shmcb && a2enmod headers \
+    && sed -i '/SSLCertificateFile.*snakeoil\.pem/c\SSLCertificateFile \/etc\/ssl\/certs\/localhost.crt' /etc/apache2/sites-available/default-ssl.conf \ 
+    && sed -i '/SSLCertificateKeyFile.*snakeoil\.key/cSSLCertificateKeyFile /etc/ssl/private/localhost.key' /etc/apache2/sites-available/default-ssl.conf \
+    && a2ensite default-ssl 
+    
+WORKDIR /var/www/html/
+
+COPY compose/confs_web/composer.phar composer.json composer.lock ./
+# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# RUN composer install
+RUN php composer.phar install
+
+COPY compose/confs_web/.env .htaccess index.php ./

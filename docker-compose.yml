@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: compose/Dockerfile_web
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - APACHE_RUN_USER=#1000
+    volumes:
+      - ./app:/var/www/html/app/
+      - ./certs/.secrets/ssl_local.my.crt:/etc/ssl/certs/localhost.crt
+      - ./certs/.secrets/ssl_local.my.key:/etc/ssl/private/localhost.key
+    ports:
+      - 8080:80
+      - 4443:443
+    working_dir: /var/www/html
+    depends_on:
+      - db
+      - adminer
+    restart: unless-stopped
+
+  db:
+    build:
+      context: .
+      dockerfile: compose/Dockerfile_db
+    env_file:
+      - ./compose/confs_web/.env
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+
+  adminer:
+    image: docker.io/library/adminer:latest
+    ports:
+      - 8088:8080
+    restart: unless-stopped
