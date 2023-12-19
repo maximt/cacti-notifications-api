@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+use App\Libs\DI;
+
+require_once __DIR__ . "/../../vendor/autoload.php";
+
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__.'/../..');
+$dotenv->load();
+
+$push = DI::Container()->get('PushSender');
+$push->sendMessage('test message');
