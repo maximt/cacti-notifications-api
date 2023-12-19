@@ -1,0 +1,12 @@
+/.vscode/
+/vendor/
+/.secrets
+/certs/.secrets
+/deploy/.secrets
+/deploy/inventory
+logs
+*.key
+.env
+.env_*
+/db/
+/tmp/
