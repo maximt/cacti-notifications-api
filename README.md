@@ -1,5 +1,8 @@
 # cacti-notifications-api
 
+REST API and WebPush notifications for Cacti network monitoring service.
+Used for building mobile applications, tiny web clients etc.
+
 ### /login (POST)
 Get auth token by cacti's user/password.
 ```
